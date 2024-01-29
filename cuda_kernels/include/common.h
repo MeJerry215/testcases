@@ -74,6 +74,16 @@ using std::max;
     }
 
 
+#define REGISTER_BUFF(name, bytes)                  \
+    void* h_##name = (void*)malloc(bytes);          \
+    void* d_##name = nullptr;                       \
+    CHECK_CALL_ERROR(cudaMalloc((void**)&d_##name, bytes))
+
+#define FREE_BUFF(name)     \
+    free(h_##name);         \
+    CHECK_CALL_ERROR(cudaFree(d_##name));
+
+
 template<typename T>
 size_t bytes_of()
 {
@@ -86,12 +96,14 @@ size_t bytes_of(size_t num, Args... args)
     return num * bytes_of<T>(args...);
 }
 
-size_t num_of_elems() {
+size_t num_of_elems()
+{
     return 1;
 }
 
 template<typename... Args>
-size_t num_of_elems(size_t num, Args... args) {
+size_t num_of_elems(size_t num, Args... args)
+{
     return num *  bytes_of(args...);
 }
 
@@ -174,11 +186,11 @@ T random_value()
 }
 
 template<typename T>
-void gen_random(T *data, size_t n_elems) {
+void gen_random(T* data, size_t n_elems)
+{
     assert(data != nullptr);
+
     while (n_elems--)
-    {
         data[n_elems] = random_value<T>();
-    }
 }
 
